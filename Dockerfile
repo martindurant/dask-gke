@@ -18,21 +18,18 @@ ENV PATH="/work/bin:/work/miniconda/bin:$PATH"
 
 # Install pydata stack
 RUN conda config --set always_yes yes --set changeps1 no --set auto_update_conda no
-RUN conda install notebook psutil numpy pandas scikit-learn statsmodels pip numba \
-        scikit-image datashader holoviews nomkl matplotlib lz4 tornado
-RUN conda install -c conda-forge fastparquet s3fs zict python-blosc cytoolz dask distributed dask-searchcv gcsfs \
- && conda clean -tipsy \
- && pip install git+https://github.com/dask/dask-glm.git --no-deps\
- && pip install graphviz
+RUN conda update conda \
+ && conda install notebook psutil numpy pandas scikit-learn statsmodels pip numba \
+     scikit-image datashader holoviews nomkl matplotlib lz4 tornado dask distributed \
+ && conda install fastparquet s3fs zict blosc cytoolz gcsfs graphviz -c conda-forge -c defaults
 
-RUN conda install -c conda-forge nodejs
-RUN conda install -c conda-forge jupyterlab jupyter_dashboards ipywidgets \
+RUN conda install -c conda-forge nodejs jupyterlab jupyter_dashboards ipywidgets \
  && jupyter labextension install @jupyter-widgets/jupyterlab-manager \
  && jupyter nbextension enable jupyter_dashboards --py --sys-prefix \
- && jupyter nbextension enable widgetsnbextension --py --sys-prefix \
- && conda clean -tipsy
+ && jupyter nbextension enable widgetsnbextension --py --sys-prefix
 
 RUN conda install -c bokeh bokeh \
+ && conda install -c damianavila82 rise \
  && jupyter labextension install jupyterlab_bokeh \
  && conda clean -tipsy \
  && npm cache clean --force
@@ -40,9 +37,9 @@ RUN conda install -c bokeh bokeh \
 # Optional: Install the master branch of distributed and dask
 RUN pip install git+https://github.com/dask/dask --upgrade --no-deps \
  && pip install git+https://github.com/dask/distributed --upgrade --no-deps \
- && pip install git+https://github.com/dask/gcsfs --upgrade \
- && pip install git+https://github.com/pydata/xarray --upgrade \
- && pip install git+https://github.com/zarr-developers/zarr --upgrade
+ && pip install git+https://github.com/dask/gcsfs --upgrade --no-deps \
+ && pip install git+https://github.com/pydata/xarray --upgrade --no-deps \
+ && pip install git+https://github.com/zarr-developers/zarr --upgrade  --no-deps
 
 # Install Tini that necessary to properly run the notebook service in docker
 # http://jupyter-notebook.readthedocs.org/en/latest/public_server.html#docker-cmd
